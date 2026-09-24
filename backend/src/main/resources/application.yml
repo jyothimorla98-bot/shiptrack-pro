@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: shiptrack-pro
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/shiptrackpro
+      auto-index-creation: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:shiptrack-pro-dev-secret-key-change-me-in-production-0123456789}
+    expiration-ms: 86400000
+    refresh-expiration-ms: 604800000
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+  storage:
+    location: ./uploads
+  notifications:
+    email-enabled: false
+    sms-enabled: false
+  seed:
+    enabled: true
+  simulation:
+    enabled: true
+    interval-ms: 8000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.shiptrack: INFO
+    org.springframework.data.mongodb.core.MongoTemplate: INFO

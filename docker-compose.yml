@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: shiptrack-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: shiptrack-backend
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      # Inside Compose the database host is the service name, not localhost.
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/shiptrackpro
+      JWT_SECRET: change-me-to-a-long-random-string-in-production-0123456789
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://localhost
+      APP_SEED_ENABLED: "true"
+      APP_SIMULATION_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    container_name: shiptrack-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mongo-data:
+  uploads:
